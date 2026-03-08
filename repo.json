@@ -1,1 +1,0 @@
-{\n  "name": "Sansekai Drama Repo",\n  "description": "Short Drama (DramaBox, ReelShort, ShortMax)",\n  "manifestVersion": 1,\n  "pluginLists": [\n    "https://raw.githubusercontent.com/querhen/sansekai-cloudstream/main/plugins.json"\n  ]\n}

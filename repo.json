@@ -1,0 +1,8 @@
+{
+  "name": "Sansekai Drama Repo",
+  "description": "Professional Cloudstream repo for short drama providers (Sansekai / DramaBox style APIs)",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/querhen/sansekai-cloudstream/main/plugins.json"
+  ]
+}

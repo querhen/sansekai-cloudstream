@@ -1,1 +1,27 @@
-placeholder
+// Complete Cloudstream plugin code for drama.sansekai.my.id
+
+const API_BASE = 'https://dramabox.sansekai.my.id/api';
+
+class DramaSansekai {
+    async getMainPage() {
+        const response = await fetch(`${API_BASE}/mainPage`);
+        return await response.json();
+    }
+
+    async search(query) {
+        const response = await fetch(`${API_BASE}/search?query=${encodeURIComponent(query)}`);
+        return await response.json();
+    }
+
+    async load(dramaId) {
+        const response = await fetch(`${API_BASE}/drama/${dramaId}`);
+        return await response.json();
+    }
+
+    async loadLinks(dramaId) {
+        const response = await fetch(`${API_BASE}/drama/${dramaId}/links`);
+        return await response.json();
+    }
+}
+
+export default new DramaSansekai();

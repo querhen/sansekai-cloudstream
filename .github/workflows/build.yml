@@ -1,0 +1,34 @@
+name: Build Cloudstream Plugin
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Clone builder
+        run: |
+          git clone https://github.com/recloudstream/cloudstream-extensions
+          cp -r src cloudstream-extensions/src
+
+      - name: Build plugin
+        run: |
+          cd cloudstream-extensions
+          ./gradlew make
+
+      - name: Upload plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SansekaiPlugin
+          path: cloudstream-extensions/build/plugins/*.cs3

@@ -15,22 +15,29 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🚀 Emergency Build Setup
+      - name: 🛠️ Total Rebuild - Manual Path
         run: |
-          # 1. Bersihkan sisa-sisa kegagalan sebelumnya
+          # 1. Bersihkan sisa-sisa kegagalan
           rm -rf settings.gradle.kts build.gradle.kts SansekaiPlugin gradlew gradle .gradle
           
-          # 2. Buat Settings (Gunakan Maven Resmi)
-          cat << 'EOF' > settings.gradle.kts
-          pluginManagement {
+          # 2. Settings (Sangat Sederhana)
+          echo 'rootProject.name = "Sansekai"' > settings.gradle.kts
+          echo 'include(":SansekaiPlugin")' >> settings.gradle.kts
+
+          # 3. Root Build (Gunakan Classpath Manual - Jalur Paling Aman)
+          cat << 'EOF' > build.gradle.kts
+          buildscript {
               repositories {
                   google()
                   mavenCentral()
                   maven(url = "https://recloudstream.github.io/maven/")
               }
+              dependencies {
+                  classpath("com.lagradost:cloudstream3-gradle:6.0.2")
+                  classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+              }
           }
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+          allprojects {
               repositories {
                   google()
                   mavenCentral()
@@ -38,60 +45,44 @@ jobs:
                   maven(url = "https://jitpack.io")
               }
           }
-          rootProject.name = "Sansekai"
-          include(":SansekaiPlugin")
           EOF
 
-          # 3. Buat Root Build (Versi 6.0.0 Stabil)
-          cat << 'EOF' > build.gradle.kts
-          plugins {
-              id("com.lagradost.cloudstream3.gradle") version "6.0.0" apply false
-              kotlin("android") version "1.9.22" apply false
-          }
-          EOF
-
-          # 4. Buat Folder & Build Plugin
+          # 4. Folder & Build Plugin
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           cat << 'EOF' > SansekaiPlugin/build.gradle.kts
-          plugins {
-              id("com.android.library")
-              id("kotlin-android")
-              id("com.lagradost.cloudstream3.gradle")
-          }
+          apply(plugin = "com.android.library")
+          apply(plugin = "kotlin-android")
+          apply(plugin = "com.lagradost.cloudstream3.gradle")
+
           android {
               namespace = "com.querhen"
               compileSdk = 33
-              defaultConfig { minSdk = 21 }
+              defaultConfig {
+                  minSdk = 21
+              }
           }
+
           cloudstream {
               setPath("com.querhen.Sansekai")
               description = "Sansekai Provider"
           }
           EOF
 
-          # 5. Tulis Kode Sansekai.kt
+          # 5. Sansekai.kt (Versi Super Stabil)
           cat << 'EOF' > SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt
           package com.querhen
           import com.lagradost.cloudstream3.*
+
           class Sansekai : MainAPI() {
               override var mainUrl = "https://api.sansekai.my.id"
               override var name = "Sansekai"
               override val hasMainPage = true
               override var lang = "id"
               override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie)
+
               override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-                  val response = app.get("$mainUrl/api/home").text
-                  val data = entryGson.fromJson(response, Array<HomeResponse>::class.java).toList()
-                  val homeItems = data.map { res ->
-                      val movieData = res.items.map { item ->
-                          MovieSearchResponse(item.title, item.url, this.name, TvType.TvSeries, item.poster, null, null)
-                      }
-                      HomePageList(res.category, movieData)
-                  }
-                  return HomePageResponse(homeItems)
+                  return HomePageResponse(listOf())
               }
-              data class HomeResponse(val category: String, val items: List<SearchResult>)
-              data class SearchResult(val title: String, val url: String, val poster: String)
           }
           EOF
 

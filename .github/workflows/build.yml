@@ -15,12 +15,37 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Cleanup & Fix Structure
+      - name: Force Fix Structure and Settings
         run: |
-          # Hapus paksa file 'gradle' atau folder sampah yang bikin error
-          rm -rf gradle gradlew gradlew.bat .gradle
+          # 1. Hapus semua file gradle yang bikin konflik
+          rm -rf gradle gradlew gradlew.bat .gradle settings.gradle.kts build.gradle.kts
           
-          # Rapikan folder kode Sansekai
+          # 2. Buat ulang settings.gradle.kts yang SEMPURNA
+          echo 'pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  maven { url = uri("https://jitpack.io") }
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+                  maven { url = uri("https://jitpack.io") }
+              }
+          }
+          rootProject.name = "Sansekai"
+          include(":SansekaiPlugin")' > settings.gradle.kts
+
+          # 3. Buat ulang build.gradle.kts (Root) yang simpel
+          echo 'plugins {
+              id("com.lagradost.cloudstream3.gradle") version "6.0.2" apply false
+              kotlin("android") version "1.9.22" apply false
+          }' > build.gradle.kts
+
+          # 4. Rapikan folder kode Sansekai
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
 
@@ -28,7 +53,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
-          cache-disabled: true # Supaya tidak pakai data error yang lama
+          cache-disabled: true
 
       - name: Build Plugin
         run: gradle :SansekaiPlugin:make --stacktrace --no-daemon

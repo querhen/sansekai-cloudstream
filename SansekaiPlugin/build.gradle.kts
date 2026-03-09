@@ -1,3 +1,5 @@
+import com.lagradost.cloudstream3.gradle.CloudstreamExtension
+
 plugins {
     id("com.android.library")
     kotlin("android")
@@ -7,10 +9,13 @@ plugins {
 android {
     namespace = "com.querhen.sansekai"
     compileSdk = 33
-    defaultConfig { minSdk = 21 }
+    defaultConfig {
+        minSdk = 21
+    }
 }
 
 cloudstream {
+    // Pastikan ini merujuk ke class utama di Sansekai.kt
     setPath("com.querhen.Sansekai")
-    description = "Nonton Drama & Anime gratis dari Sansekai API"
+    description = "Nonton Drama & Shortmax via Sansekai API"
 }

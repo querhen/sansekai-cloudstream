@@ -1,9 +1,8 @@
-name: Build Extensions
+name: Build Plugin
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -14,21 +13,28 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Clone extensions repo
-        run: git clone https://github.com/recloudstream/cloudstream-extensions.git
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Clone builder
+        run: |
+          git clone --depth 1 https://github.com/recloudstream/cloudstream-extensions.git
 
       - name: Copy plugin
         run: |
           cp -r SansekaiDrama cloudstream-extensions/
 
-      - name: Build extensions
+      - name: Build plugin
         run: |
           cd cloudstream-extensions
           chmod +x gradlew
           ./gradlew make
 
-      - name: Upload plugins
+      - name: Upload plugin
         uses: actions/upload-artifact@v4
         with:
-          name: plugins
+          name: plugin
           path: cloudstream-extensions/build/plugins/*.cs3

@@ -17,10 +17,10 @@ jobs:
 
       - name: Force Clean & Reset Configuration
         run: |
-          # 1. Hapus sisa sampah
+          # 1. Hapus sisa sampah yang bikin konflik
           rm -rf gradle gradlew gradlew.bat .gradle settings.gradle.kts build.gradle.kts
           
-          # 2. Buat Settings & Root Build yang segar
+          # 2. Buat Settings & Root Build yang segar (Kunci JitPack)
           echo 'pluginManagement { repositories { google(); mavenCentral(); maven { url = uri("https://jitpack.io") } } }
           dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral(); maven { url = uri("https://jitpack.io") } } }
           rootProject.name = "Sansekai"
@@ -35,7 +35,7 @@ jobs:
           android { namespace = "com.querhen"; compileSdk = 33; defaultConfig { minSdk = 21 } }
           cloudstream { setPath("com.querhen.Sansekai"); description = "Provider Sansekai API" }' > SansekaiPlugin/build.gradle.kts
 
-          # 4. Pindahkan file kode utama ke folder yang seharusnya
+          # 4. Pindahkan file kode utama ke folder yang SEHARUSNYA
           if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
 
       - name: Setup Gradle

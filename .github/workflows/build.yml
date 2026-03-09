@@ -15,27 +15,28 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🧹 Total Reset & Classic Path
+      - name: 🧹 Clean & Switch to Official Maven
         run: |
-          # Bersihkan total file lama
+          # Hapus file lama agar tidak ada sisa error 401
           rm -rf settings.gradle.kts build.gradle.kts SansekaiPlugin gradlew gradle .gradle
           
-          # 1. Tulis Settings (Sangat Sederhana)
+          # 1. Tulis Settings
           cat << 'EOF' > settings.gradle.kts
           rootProject.name = "Sansekai"
           include(":SansekaiPlugin")
           EOF
 
-          # 2. Tulis Root Build (Gunakan Jalur Klasik buildscript)
+          # 2. Tulis Root Build (Gunakan Maven Resmi ReCloudstream)
           cat << 'EOF' > build.gradle.kts
           buildscript {
               repositories {
                   google()
                   mavenCentral()
-                  maven(url = "https://jitpack.io")
+                  maven(url = "https://recloudstream.github.io/maven/")
               }
               dependencies {
-                  classpath("com.github.lagradost:cloudstream-gradle:master-SNAPSHOT")
+                  // Gunakan library resmi, bukan JitPack untuk plugin ini
+                  classpath("com.lagradost:cloudstream3-gradle:6.0.2")
                   classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
               }
           }
@@ -44,12 +45,13 @@ jobs:
               repositories {
                   google()
                   mavenCentral()
+                  maven(url = "https://recloudstream.github.io/maven/")
                   maven(url = "https://jitpack.io")
               }
           }
           EOF
 
-          # 3. Tulis Build Plugin (Hanya Apply Plugin)
+          # 3. Tulis Build Plugin
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           cat << 'EOF' > SansekaiPlugin/build.gradle.kts
           apply(plugin = "com.android.library")
@@ -59,10 +61,12 @@ jobs:
           android {
               namespace = "com.querhen"
               compileSdk = 33
-              defaultConfig { minSdk = 21 }
+              defaultConfig {
+                  minSdk = 21
+              }
           }
 
-          configure<com.lagradost.cloudstream3.gradle.CloudstreamExtension> {
+          cloudstream {
               setPath("com.querhen.Sansekai")
               description = "Sansekai Provider"
           }

@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build Plugin
 on:
   push:
     branches: [ main, master ]
@@ -15,12 +15,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🧹 Clean & Rewrite All Files
+      - name: 🧹 Reset & Fix
         run: |
-          # Bersihkan sisa-sisa file lama
-          rm -rf SansekaiPlugin Sansekai.kt settings.gradle.kts build.gradle.kts gradle .gradle
+          rm -rf settings.gradle.kts build.gradle.kts SansekaiPlugin gradlew gradle .gradle
           
-          # 1. Tulis Settings (Wajib ada JitPack di sini)
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
@@ -41,7 +39,6 @@ jobs:
           include(":SansekaiPlugin")
           EOF
 
-          # 2. Tulis Root Build
           cat << 'EOF' > build.gradle.kts
           plugins {
               id("com.lagradost.cloudstream3.gradle") version "6.0.2" apply false
@@ -49,13 +46,12 @@ jobs:
           }
           EOF
 
-          # 3. Buat Folder & Tulis Plugin Build
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           cat << 'EOF' > SansekaiPlugin/build.gradle.kts
           import com.lagradost.cloudstream3.gradle.CloudstreamExtension
           plugins {
               id("com.android.library")
-              kotlin("android")
+              id("kotlin-android")
               id("com.lagradost.cloudstream3.gradle")
           }
           android {
@@ -65,11 +61,10 @@ jobs:
           }
           cloudstream {
               setPath("com.querhen.Sansekai")
-              description = "Sansekai API Provider"
+              description = "Sansekai Provider"
           }
           EOF
 
-          # 4. Tulis Kode Sansekai.kt
           cat << 'EOF' > SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt
           package com.querhen
           import com.lagradost.cloudstream3.*
@@ -99,12 +94,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
-          cache-disabled: true # Mematikan cache agar tidak muncul error "Layanan tidak tersedia"
+          cache-disabled: true
 
-      - name: 🚀 Build Plugin
+      - name: 🚀 Jalankan Pembangunan
         run: gradle :SansekaiPlugin:make --stacktrace --no-daemon
 
-      - name: 📦 Deploy
+      - name: 📦 Simpan Hasil
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages

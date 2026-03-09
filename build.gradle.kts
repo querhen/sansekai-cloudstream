@@ -1,19 +1,6 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url = uri("https://jitpack.io") }
-    }
-    dependencies {
-        classpath("com.lagradost:cloudstream3-gradle:6.0.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
-    }
+plugins {
+    id("com.lagradost.cloudstream3.gradle") version "6.0.2" apply false
+    kotlin("android") version "1.9.22" apply false
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url = uri("https://jitpack.io") }
-    }
-}
+// Tidak perlu blok buildscript atau allprojects lagi karena sudah di-handle settings.gradle.kts

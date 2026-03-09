@@ -15,38 +15,27 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Force Fix Structure and Settings
+      - name: Force Clean & Reset Configuration
         run: |
-          # 1. Hapus semua file gradle yang bikin konflik
+          # 1. Hapus sisa sampah
           rm -rf gradle gradlew gradlew.bat .gradle settings.gradle.kts build.gradle.kts
           
-          # 2. Buat ulang settings.gradle.kts yang SEMPURNA
-          echo 'pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  maven { url = uri("https://jitpack.io") }
-              }
-          }
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-                  maven { url = uri("https://jitpack.io") }
-              }
-          }
+          # 2. Buat Settings & Root Build yang segar
+          echo 'pluginManagement { repositories { google(); mavenCentral(); maven { url = uri("https://jitpack.io") } } }
+          dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral(); maven { url = uri("https://jitpack.io") } } }
           rootProject.name = "Sansekai"
           include(":SansekaiPlugin")' > settings.gradle.kts
 
-          # 3. Buat ulang build.gradle.kts (Root) yang simpel
-          echo 'plugins {
-              id("com.lagradost.cloudstream3.gradle") version "6.0.2" apply false
-              kotlin("android") version "1.9.22" apply false
-          }' > build.gradle.kts
+          echo 'plugins { id("com.lagradost.cloudstream3.gradle") version "6.0.2" apply false; kotlin("android") version "1.9.22" apply false }' > build.gradle.kts
 
-          # 4. Rapikan folder kode Sansekai
+          # 3. Reset file Build di dalam folder SansekaiPlugin agar tidak typo
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
+          echo 'import com.lagradost.cloudstream3.gradle.CloudstreamExtension
+          plugins { id("com.android.library"); kotlin("android"); id("com.lagradost.cloudstream3.gradle") }
+          android { namespace = "com.querhen"; compileSdk = 33; defaultConfig { minSdk = 21 } }
+          cloudstream { setPath("com.querhen.Sansekai"); description = "Provider Sansekai API" }' > SansekaiPlugin/build.gradle.kts
+
+          # 4. Pindahkan file kode utama ke folder yang seharusnya
           if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
 
       - name: Setup Gradle
@@ -63,4 +52,5 @@ jobs:
         with:
           branch: gh-pages
           folder: build
+          clean: true
           

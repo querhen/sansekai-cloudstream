@@ -15,33 +15,34 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🛠️ Total Rebuild - Manual Path
+      - name: 🛠️ Final Rebuild - ReCloudstream Path
         run: |
-          # 1. Bersihkan sisa-sisa kegagalan
+          # 1. Bersihkan sisa kegagalan
           rm -rf settings.gradle.kts build.gradle.kts SansekaiPlugin gradlew gradle .gradle
           
-          # 2. Settings (Sangat Sederhana)
+          # 2. Settings sederhana
           echo 'rootProject.name = "Sansekai"' > settings.gradle.kts
           echo 'include(":SansekaiPlugin")' >> settings.gradle.kts
 
-          # 3. Root Build (Gunakan Classpath Manual - Jalur Paling Aman)
+          # 3. Root Build (Gunakan grup RECLOUDSTREAM - ini kuncinya)
           cat << 'EOF' > build.gradle.kts
           buildscript {
               repositories {
                   google()
                   mavenCentral()
-                  maven(url = "https://recloudstream.github.io/maven/")
+                  maven(url = "https://jitpack.io")
               }
               dependencies {
-                  classpath("com.lagradost:cloudstream3-gradle:6.0.2")
+                  // Menggunakan alamat organisasi baru: recloudstream
+                  classpath("com.github.recloudstream:gradle:master-SNAPSHOT")
                   classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
               }
           }
+
           allprojects {
               repositories {
                   google()
                   mavenCentral()
-                  maven(url = "https://recloudstream.github.io/maven/")
                   maven(url = "https://jitpack.io")
               }
           }
@@ -68,7 +69,7 @@ jobs:
           }
           EOF
 
-          # 5. Sansekai.kt (Versi Super Stabil)
+          # 5. Sansekai.kt (Paling simpel dulu biar Hijau)
           cat << 'EOF' > SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt
           package com.querhen
           import com.lagradost.cloudstream3.*

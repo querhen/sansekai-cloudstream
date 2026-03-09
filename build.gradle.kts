@@ -5,9 +5,9 @@ buildscript {
         maven("https://jitpack.io")
     }
     dependencies {
-        // Ini adalah plugin yang menyediakan perintah 'make'
+        // Plugin ini yang menyediakan perintah 'make'
         classpath("com.lagradost:cloudstream3-gradle:6.0.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
     }
 }
 

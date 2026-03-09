@@ -15,24 +15,22 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🧹 Clean & Final Fix
+      - name: 🧹 Clean & Force Master Version
         run: |
-          # Bersihkan total file lama
           rm -rf settings.gradle.kts build.gradle.kts SansekaiPlugin gradlew gradle .gradle
           
-          # 1. Tulis Settings (Gunakan // untuk komentar Kotlin)
+          # 1. Tulis Settings (Gunakan master-SNAPSHOT agar pasti ada di JitPack)
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
                   google()
                   mavenCentral()
                   maven(url = "https://jitpack.io")
-                  maven(url = "https://recloudstream.github.io/maven/")
               }
               resolutionStrategy {
                   eachPlugin {
                       if (requested.id.id == "com.lagradost.cloudstream3.gradle") {
-                          useModule("com.github.lagradost:cloudstream-gradle:${requested.version}")
+                          useModule("com.github.lagradost:cloudstream-gradle:master-SNAPSHOT")
                       }
                   }
               }
@@ -43,7 +41,6 @@ jobs:
                   google()
                   mavenCentral()
                   maven(url = "https://jitpack.io")
-                  maven(url = "https://recloudstream.github.io/maven/")
               }
           }
           rootProject.name = "Sansekai"
@@ -53,7 +50,7 @@ jobs:
           # 2. Tulis Build Utama
           cat << 'EOF' > build.gradle.kts
           plugins {
-              id("com.lagradost.cloudstream3.gradle") version "6.0.2" apply false
+              id("com.lagradost.cloudstream3.gradle") version "master-SNAPSHOT" apply false
               kotlin("android") version "1.9.22" apply false
           }
           EOF

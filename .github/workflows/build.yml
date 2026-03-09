@@ -15,12 +15,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🧹 Clean & Fix Plugin Path
+      - name: 🧹 Clean & Final Fix
         run: |
           # Bersihkan total file lama
           rm -rf settings.gradle.kts build.gradle.kts SansekaiPlugin gradlew gradle .gradle
           
-          # 1. Tulis Settings (Nama modul diperbaiki: cloudstream-gradle)
+          # 1. Tulis Settings (Gunakan // untuk komentar Kotlin)
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
@@ -32,7 +32,6 @@ jobs:
               resolutionStrategy {
                   eachPlugin {
                       if (requested.id.id == "com.lagradost.cloudstream3.gradle") {
-                          # PERBAIKAN: Menggunakan cloudstream-gradle (Tanpa angka 3)
                           useModule("com.github.lagradost:cloudstream-gradle:${requested.version}")
                       }
                   }

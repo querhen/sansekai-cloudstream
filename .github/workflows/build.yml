@@ -15,41 +15,65 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🛠️ Setup Project Struktur
+      - name: 🧹 Sapu Bersih & Tulis Ulang Proyek
         run: |
-          # 1. Bersihkan folder lama agar tidak bentrok
-          rm -rf SansekaiPlugin Sansekai.kt settings.gradle.kts build.gradle.kts
+          # 1. Hapus semua file lama yang mungkin rusak
+          rm -rf SansekaiPlugin Sansekai.kt settings.gradle.kts build.gradle.kts gradle gradlew .gradle
           
           # 2. Buat folder struktur yang benar
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           
-          # 3. Buat file settings.gradle.kts
-          echo 'pluginManagement { repositories { google(); mavenCentral(); maven { url = uri("https://jitpack.io") } } }
-          dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral(); maven { url = uri("https://jitpack.io") } } }
-          rootProject.name = "Sansekai"
-          include(":SansekaiPlugin")' > settings.gradle.kts
+          # 3. Tulis file settings.gradle.kts (Konfigurasi JitPack Utama)
+          echo "pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  maven { url = uri(\"https://jitpack.io\") }
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+                  maven { url = uri(\"https://jitpack.io\") }
+              }
+          }
+          rootProject.name = \"Sansekai\"
+          include(\":SansekaiPlugin\")" > settings.gradle.kts
 
-          # 4. Buat file build.gradle.kts (Root)
-          echo 'plugins { id("com.lagradost.cloudstream3.gradle") version "6.0.2" apply false; kotlin("android") version "1.9.22" apply false }' > build.gradle.kts
+          # 4. Tulis file build.gradle.kts (Root)
+          echo "plugins {
+              id(\"com.lagradost.cloudstream3.gradle\") version \"6.0.2\" apply false
+              kotlin(\"android\") version \"1.9.22\" apply false
+          }" > build.gradle.kts
 
-          # 5. Buat file build.gradle.kts (Plugin)
-          echo 'import com.lagradost.cloudstream3.gradle.CloudstreamExtension
-          plugins { id("com.android.library"); kotlin("android"); id("com.lagradost.cloudstream3.gradle") }
-          android { namespace = "com.querhen"; compileSdk = 33; defaultConfig { minSdk = 21 } }
-          cloudstream { setPath("com.querhen.Sansekai"); description = "Provider Sansekai API" }' > SansekaiPlugin/build.gradle.kts
+          # 5. Tulis file build.gradle.kts (Plugin)
+          echo "import com.lagradost.cloudstream3.gradle.CloudstreamExtension
+          plugins {
+              id(\"com.android.library\")
+              kotlin(\"android\")
+              id(\"com.lagradost.cloudstream3.gradle\")
+          }
+          android {
+              namespace = \"com.querhen\"
+              compileSdk = 33
+              defaultConfig { minSdk = 21 }
+          }
+          cloudstream {
+              setPath(\"com.querhen.Sansekai\")
+              description = \"Nonton Drama & ShortMax via Sansekai API\"
+          }" > SansekaiPlugin/build.gradle.kts
 
-          # 6. Menulis kode Sansekai.kt (Versi Stabil)
+          # 6. Tulis Kode Sansekai.kt
           cat << 'EOF' > SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt
           package com.querhen
           import com.lagradost.cloudstream3.*
-          import com.lagradost.cloudstream3.utils.ExtractorLink
-          import com.lagradost.cloudstream3.utils.loadExtractor
           class Sansekai : MainAPI() {
               override var mainUrl = "https://api.sansekai.my.id"
               override var name = "Sansekai"
               override val hasMainPage = true
               override var lang = "id"
-              override val hasQuickSearch = true
               override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie)
               override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
                   val response = app.get("$mainUrl/api/home").text
@@ -62,37 +86,20 @@ jobs:
                   }
                   return HomePageResponse(homeItems)
               }
-              override suspend fun search(query: String): List<SearchResponse> {
-                  val response = app.get("$mainUrl/api/search?q=$query").text
-                  val results = entryGson.fromJson(response, Array<SearchResult>::class.java).toList()
-                  return results.map { MovieSearchResponse(it.title, it.url, this.name, TvType.TvSeries, it.poster, null, null) }
-              }
-              override suspend fun load(url: String): LoadResponse {
-                  val response = app.get(url).text
-                  val res = entryGson.fromJson(response, MovieDetail::class.java)
-                  return TvSeriesLoadResponse(res.title, url, this.name, TvType.TvSeries, res.episodes.map { Episode(it.url, it.name, it.season, it.number) }, res.poster, res.year, res.plot)
-              }
-              override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
-                  loadExtractor(data, subtitleCallback, callback)
-                  return true
-              }
+              data class HomeResponse(val category: String, val items: List<SearchResult>)
+              data class SearchResult(val title: String, val url: String, val poster: String)
           }
-          data class HomeResponse(val category: String, val items: List<SearchResult>)
-          data class SearchResult(val title: String, val url: String, val poster: String)
-          data class MovieDetail(val title: String, val poster: String, val year: Int?, val plot: String?, val episodes: List<EpisodeDetail>)
-          data class EpisodeDetail(val name: String, val url: String, val season: Int?, val number: Int?)
           EOF
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
-          cache-disabled: true
 
-      - name: 🚀 Build Plugin
+      - name: 🚀 Run Build
         run: gradle :SansekaiPlugin:make --stacktrace --no-daemon
 
-      - name: 📦 Deploy to GitHub Pages
+      - name: 📦 Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages

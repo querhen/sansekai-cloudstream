@@ -17,15 +17,13 @@ jobs:
 
       - name: Setup Project Structure
         run: |
-          # Memastikan folder ada sesuai struktur Cloudstream
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
-          # Memindahkan file provider ke tempat yang benar jika masih di luar
           if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: 8.0
+          gradle-version: 8.0 # Versi ini sudah teruji stabil
 
       - name: Build with Gradle
         run: gradle make --stacktrace

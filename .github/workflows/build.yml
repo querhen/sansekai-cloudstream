@@ -1,42 +1,13 @@
-name: Build and Debug
-on:
-  push:
-    branches: [ main, master ]
+name: Check Files
+on: [push]
 
 jobs:
-  debug_and_build:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: 🔍 DEBUG: Check File Structure
+      - name: List Files
         run: |
-          echo "=== DAFTAR SEMUA FILE DI REPOSITORY ==="
-          find . -maxdepth 4 -not -path '*/.*'
-          echo "======================================="
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: 🛠️ AUTO-FIX: Force Correct Structure
-        run: |
-          # Perintah ini akan mencoba memperbaiki folder jika kamu salah buat di HP
-          mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
+          echo "--- STRUKTUR REPO KAMU ---"
+          ls -R
           
-          # Jika file Sansekai.kt ada di folder luar, kita pindahkan ke dalam
-          if [ -f Sansekai.kt ]; then 
-            mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt
-            echo "✅ File Sansekai.kt ditemukan di root dan sudah dipindahkan."
-          fi
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: 8.5
-
-      - name: 🚀 Build Plugin
-        run: gradle :SansekaiPlugin:make --stacktrace --no-daemon
-        

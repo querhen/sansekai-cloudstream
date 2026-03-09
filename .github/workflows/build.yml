@@ -15,23 +15,25 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🧹 Clean & Fix Plugin Mapping
+      - name: 🧹 Clean & Fix Plugin Path
         run: |
           # Bersihkan total file lama
           rm -rf settings.gradle.kts build.gradle.kts SansekaiPlugin gradlew gradle .gradle
           
-          # 1. Tulis Settings dengan GPS Manual (Mapping)
+          # 1. Tulis Settings (Nama modul diperbaiki: cloudstream-gradle)
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
                   google()
                   mavenCentral()
                   maven(url = "https://jitpack.io")
+                  maven(url = "https://recloudstream.github.io/maven/")
               }
               resolutionStrategy {
                   eachPlugin {
                       if (requested.id.id == "com.lagradost.cloudstream3.gradle") {
-                          useModule("com.github.lagradost:cloudstream3-gradle:${requested.version}")
+                          # PERBAIKAN: Menggunakan cloudstream-gradle (Tanpa angka 3)
+                          useModule("com.github.lagradost:cloudstream-gradle:${requested.version}")
                       }
                   }
               }
@@ -42,6 +44,7 @@ jobs:
                   google()
                   mavenCentral()
                   maven(url = "https://jitpack.io")
+                  maven(url = "https://recloudstream.github.io/maven/")
               }
           }
           rootProject.name = "Sansekai"

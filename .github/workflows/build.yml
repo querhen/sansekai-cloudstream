@@ -14,22 +14,25 @@ jobs:
 
       - name: Force Cleanup and Setup
         run: |
-          # Menghapus file/folder gradle yang konflik
-          rm -rf gradle 
-          rm -f gradlew
+          # Bersihkan file sampah hasil error sebelumnya
+          rm -rf gradle gradlew gradlew.bat
           
-          # Membuat ulang struktur folder yang benar
+          # Buat struktur folder
           mkdir -p gradle/wrapper
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           
-          # Pindahkan Sansekai.kt ke folder yang benar agar terbaca compiler
-          if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
+          # Download Wrapper dari link RAW (Pasti Script, Bukan HTML)
+          curl -L "https://raw.githubusercontent.com/recloudstream/gradle-template/master/gradlew" -o gradlew
+          curl -L "https://raw.githubusercontent.com/recloudstream/gradle-template/master/gradle/wrapper/gradle-wrapper.jar" -o gradle/wrapper/gradle-wrapper.jar
+          curl -L "https://raw.githubusercontent.com/recloudstream/gradle-template/master/gradle/wrapper/gradle-wrapper.properties" -o gradle/wrapper/gradle-wrapper.properties
           
-          # Download Wrapper Resmi
-          curl -L https://github.com/recloudstream/gradle-template/raw/master/gradle/wrapper/gradle-wrapper.jar -o gradle/wrapper/gradle-wrapper.jar
-          curl -L https://github.com/recloudstream/gradle-template/raw/master/gradle/wrapper/gradle-wrapper.properties -o gradle/wrapper/gradle-wrapper.properties
-          curl -L https://github.com/recloudstream/gradle-template/raw/master/gradlew -o gradlew
+          # Pastikan file gradlew tidak berisi HTML
+          if grep -q "<!DOCTYPE html>" gradlew; then echo "Error: Downloaded HTML instead of script"; exit 1; fi
+          
           chmod +x gradlew
+          
+          # Pindahkan Sansekai.kt ke tempat yang benar
+          if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
 
       - name: Build Plugin
         run: ./gradlew make --stacktrace

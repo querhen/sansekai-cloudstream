@@ -19,22 +19,19 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Clone builder
-        run: |
-          git clone --depth 1 https://github.com/recloudstream/cloudstream-extensions.git
-
-      - name: Copy plugin
-        run: |
-          cp -r SansekaiDrama cloudstream-extensions/
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
 
       - name: Build plugin
         run: |
-          cd cloudstream-extensions
           chmod +x gradlew
-          ./gradlew make
+          ./gradlew build
 
       - name: Upload plugin
         uses: actions/upload-artifact@v4
+        with:
+          name: plugin
+          path: build/libs/*.cs3        uses: actions/upload-artifact@v4
         with:
           name: plugin
           path: cloudstream-extensions/build/plugins/*.cs3

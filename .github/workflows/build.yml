@@ -18,7 +18,7 @@ jobs:
       - name: Setup Project Structure
         run: |
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
-          # Pindahkan file Sansekai.kt jika masih di luar (Root)
+          # Pindahkan Sansekai.kt ke dalam folder yang benar jika masih di root
           if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
 
       - name: Setup Gradle
@@ -29,7 +29,7 @@ jobs:
       - name: Build with Gradle
         run: gradle make --stacktrace --no-daemon
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages

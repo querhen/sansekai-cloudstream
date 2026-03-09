@@ -1,0 +1,10 @@
+{
+    "name": "Sansekai",
+    "description": "Provider khusus untuk Shortmax, DramaBox, dan Dracin via Sansekai API.",
+    "authors": ["querhen"],
+    "version": 1,
+    "apiVersion": 1,
+    "type": "TV",
+    "iconUrl": "https://drama.sansekai.my.id/favicon.ico",
+    "language": "id"
+}

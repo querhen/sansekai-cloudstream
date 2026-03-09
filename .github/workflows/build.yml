@@ -2,9 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches:
-      - master
-      - main
+    branches: [ main, master ]
 
 jobs:
   build:
@@ -19,6 +17,9 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
+      - name: Fix Permissions
+        run: chmod +x gradlew
+
       - name: Build with Gradle
         run: ./gradlew make
         
@@ -26,5 +27,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: build # Folder hasil compile
-          
+          folder: build

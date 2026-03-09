@@ -17,9 +17,10 @@ jobs:
 
       - name: Cleanup & Fix Structure
         run: |
-          # Hapus sampah gradle lama
+          # Hapus paksa file 'gradle' atau folder sampah yang bikin error
           rm -rf gradle gradlew gradlew.bat .gradle
-          # Pastikan folder kode benar
+          
+          # Rapikan folder kode Sansekai
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
 
@@ -27,7 +28,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
-          cache-disabled: true
+          cache-disabled: true # Supaya tidak pakai data error yang lama
 
       - name: Build Plugin
         run: gradle :SansekaiPlugin:make --stacktrace --no-daemon

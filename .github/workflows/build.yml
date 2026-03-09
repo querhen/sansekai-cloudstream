@@ -31,7 +31,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: plugin
-          path: build/libs/*.cs3        uses: actions/upload-artifact@v4
-        with:
-          name: plugin
-          path: cloudstream-extensions/build/plugins/*.cs3
+          path: build/libs/*.cs3

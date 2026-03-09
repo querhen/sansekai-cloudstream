@@ -1,6 +1,6 @@
 {
     "name": "Sansekai",
-    "description": "Provider khusus untuk Shortmax, DramaBox, dan Dracin via Sansekai API.",
+    "description": "Shortmax, DramaBox, & Dracin via Sansekai API",
     "authors": ["querhen"],
     "version": 1,
     "apiVersion": 1,

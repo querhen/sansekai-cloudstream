@@ -15,10 +15,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Project Structure
+      - name: Clean & Setup Structure
         run: |
+          # Hapus folder gradle lama yang mungkin isinya salah
+          rm -rf gradle gradlew gradlew.bat
+          
+          # Rapikan folder Sansekai
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
-          # Pindahkan Sansekai.kt ke dalam folder yang benar jika masih di root
           if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
 
       - name: Setup Gradle

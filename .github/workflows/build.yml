@@ -15,60 +15,54 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🧹 Clean & Force Master Version
+      - name: 🧹 Total Reset & Classic Path
         run: |
+          # Bersihkan total file lama
           rm -rf settings.gradle.kts build.gradle.kts SansekaiPlugin gradlew gradle .gradle
           
-          # 1. Tulis Settings (Gunakan master-SNAPSHOT agar pasti ada di JitPack)
+          # 1. Tulis Settings (Sangat Sederhana)
           cat << 'EOF' > settings.gradle.kts
-          pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  maven(url = "https://jitpack.io")
-              }
-              resolutionStrategy {
-                  eachPlugin {
-                      if (requested.id.id == "com.lagradost.cloudstream3.gradle") {
-                          useModule("com.github.lagradost:cloudstream-gradle:master-SNAPSHOT")
-                      }
-                  }
-              }
-          }
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-                  maven(url = "https://jitpack.io")
-              }
-          }
           rootProject.name = "Sansekai"
           include(":SansekaiPlugin")
           EOF
 
-          # 2. Tulis Build Utama
+          # 2. Tulis Root Build (Gunakan Jalur Klasik buildscript)
           cat << 'EOF' > build.gradle.kts
-          plugins {
-              id("com.lagradost.cloudstream3.gradle") version "master-SNAPSHOT" apply false
-              kotlin("android") version "1.9.22" apply false
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+                  maven(url = "https://jitpack.io")
+              }
+              dependencies {
+                  classpath("com.github.lagradost:cloudstream-gradle:master-SNAPSHOT")
+                  classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+              }
+          }
+
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+                  maven(url = "https://jitpack.io")
+              }
           }
           EOF
 
-          # 3. Tulis Build Plugin
+          # 3. Tulis Build Plugin (Hanya Apply Plugin)
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           cat << 'EOF' > SansekaiPlugin/build.gradle.kts
-          plugins {
-              id("com.android.library")
-              id("kotlin-android")
-              id("com.lagradost.cloudstream3.gradle")
-          }
+          apply(plugin = "com.android.library")
+          apply(plugin = "kotlin-android")
+          apply(plugin = "com.lagradost.cloudstream3.gradle")
+
           android {
               namespace = "com.querhen"
               compileSdk = 33
               defaultConfig { minSdk = 21 }
           }
-          cloudstream {
+
+          configure<com.lagradost.cloudstream3.gradle.CloudstreamExtension> {
               setPath("com.querhen.Sansekai")
               description = "Sansekai Provider"
           }

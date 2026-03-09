@@ -15,20 +15,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🧹 Sapu Bersih & Tulis Ulang Proyek
+      - name: 🧹 Clean & Rewrite All Files
         run: |
-          # 1. Hapus semua file lama yang mungkin rusak
-          rm -rf SansekaiPlugin Sansekai.kt settings.gradle.kts build.gradle.kts gradle gradlew .gradle
+          # Bersihkan sisa-sisa file lama
+          rm -rf SansekaiPlugin Sansekai.kt settings.gradle.kts build.gradle.kts gradle .gradle
           
-          # 2. Buat folder struktur yang benar
-          mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
-          
-          # 3. Tulis file settings.gradle.kts (Konfigurasi JitPack Utama)
-          echo "pluginManagement {
+          # 1. Tulis Settings (Wajib ada JitPack di sini)
+          cat << 'EOF' > settings.gradle.kts
+          pluginManagement {
               repositories {
                   google()
                   mavenCentral()
-                  maven { url = uri(\"https://jitpack.io\") }
+                  maven { url = uri("https://jitpack.io") }
               }
           }
           dependencyResolutionManagement {
@@ -36,36 +34,42 @@ jobs:
               repositories {
                   google()
                   mavenCentral()
-                  maven { url = uri(\"https://jitpack.io\") }
+                  maven { url = uri("https://jitpack.io") }
               }
           }
-          rootProject.name = \"Sansekai\"
-          include(\":SansekaiPlugin\")" > settings.gradle.kts
+          rootProject.name = "Sansekai"
+          include(":SansekaiPlugin")
+          EOF
 
-          # 4. Tulis file build.gradle.kts (Root)
-          echo "plugins {
-              id(\"com.lagradost.cloudstream3.gradle\") version \"6.0.2\" apply false
-              kotlin(\"android\") version \"1.9.22\" apply false
-          }" > build.gradle.kts
-
-          # 5. Tulis file build.gradle.kts (Plugin)
-          echo "import com.lagradost.cloudstream3.gradle.CloudstreamExtension
+          # 2. Tulis Root Build
+          cat << 'EOF' > build.gradle.kts
           plugins {
-              id(\"com.android.library\")
-              kotlin(\"android\")
-              id(\"com.lagradost.cloudstream3.gradle\")
+              id("com.lagradost.cloudstream3.gradle") version "6.0.2" apply false
+              kotlin("android") version "1.9.22" apply false
+          }
+          EOF
+
+          # 3. Buat Folder & Tulis Plugin Build
+          mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
+          cat << 'EOF' > SansekaiPlugin/build.gradle.kts
+          import com.lagradost.cloudstream3.gradle.CloudstreamExtension
+          plugins {
+              id("com.android.library")
+              kotlin("android")
+              id("com.lagradost.cloudstream3.gradle")
           }
           android {
-              namespace = \"com.querhen\"
+              namespace = "com.querhen"
               compileSdk = 33
               defaultConfig { minSdk = 21 }
           }
           cloudstream {
-              setPath(\"com.querhen.Sansekai\")
-              description = \"Nonton Drama & ShortMax via Sansekai API\"
-          }" > SansekaiPlugin/build.gradle.kts
+              setPath("com.querhen.Sansekai")
+              description = "Sansekai API Provider"
+          }
+          EOF
 
-          # 6. Tulis Kode Sansekai.kt
+          # 4. Tulis Kode Sansekai.kt
           cat << 'EOF' > SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt
           package com.querhen
           import com.lagradost.cloudstream3.*
@@ -95,8 +99,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.5
+          cache-disabled: true # Mematikan cache agar tidak muncul error "Layanan tidak tersedia"
 
-      - name: 🚀 Run Build
+      - name: 🚀 Build Plugin
         run: gradle :SansekaiPlugin:make --stacktrace --no-daemon
 
       - name: 📦 Deploy

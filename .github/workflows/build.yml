@@ -15,26 +15,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 🧹 Total Reset & ReCloudstream Fix
+      - name: 🚀 Emergency Build Setup
         run: |
-          # Hapus semua sisa file lama
+          # 1. Bersihkan sisa-sisa kegagalan sebelumnya
           rm -rf settings.gradle.kts build.gradle.kts SansekaiPlugin gradlew gradle .gradle
           
-          # 1. Tulis Settings (Gunakan group recloudstream, bukan lagradost)
+          # 2. Buat Settings (Gunakan Maven Resmi)
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
                   google()
                   mavenCentral()
-                  maven(url = "https://jitpack.io")
-              }
-              resolutionStrategy {
-                  eachPlugin {
-                      if (requested.id.id == "com.lagradost.cloudstream3.gradle") {
-                          // ALAMAT BARU: Menggunakan organisasi recloudstream
-                          useModule("com.github.recloudstream:gradle:master-SNAPSHOT")
-                      }
-                  }
+                  maven(url = "https://recloudstream.github.io/maven/")
               }
           }
           dependencyResolutionManagement {
@@ -42,6 +34,7 @@ jobs:
               repositories {
                   google()
                   mavenCentral()
+                  maven(url = "https://recloudstream.github.io/maven/")
                   maven(url = "https://jitpack.io")
               }
           }
@@ -49,15 +42,15 @@ jobs:
           include(":SansekaiPlugin")
           EOF
 
-          # 2. Tulis Root Build
+          # 3. Buat Root Build (Versi 6.0.0 Stabil)
           cat << 'EOF' > build.gradle.kts
           plugins {
-              id("com.lagradost.cloudstream3.gradle") version "master-SNAPSHOT" apply false
+              id("com.lagradost.cloudstream3.gradle") version "6.0.0" apply false
               kotlin("android") version "1.9.22" apply false
           }
           EOF
 
-          # 3. Tulis Build Plugin
+          # 4. Buat Folder & Build Plugin
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           cat << 'EOF' > SansekaiPlugin/build.gradle.kts
           plugins {
@@ -76,7 +69,7 @@ jobs:
           }
           EOF
 
-          # 4. Tulis Kode Sansekai.kt
+          # 5. Tulis Kode Sansekai.kt
           cat << 'EOF' > SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt
           package com.querhen
           import com.lagradost.cloudstream3.*

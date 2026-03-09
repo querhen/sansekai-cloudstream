@@ -17,7 +17,9 @@ jobs:
 
       - name: Cleanup & Fix Structure
         run: |
+          # Hapus sampah gradle lama
           rm -rf gradle gradlew gradlew.bat .gradle
+          # Pastikan folder kode benar
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
 

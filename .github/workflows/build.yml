@@ -15,11 +15,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Clean Old Files
+      - name: Clean and Setup
         run: |
-          # Menghapus sisa-sisa file gradle yang mungkin korup di repo
+          # Hapus sisa file gradle lama agar tidak konflik
           rm -rf gradle gradlew gradlew.bat
-          # Memastikan folder kode sudah benar
+          # Pastikan file Sansekai.kt masuk ke folder yang benar
           mkdir -p SansekaiPlugin/src/main/kotlin/com/querhen
           if [ -f Sansekai.kt ]; then mv Sansekai.kt SansekaiPlugin/src/main/kotlin/com/querhen/Sansekai.kt; fi
 
@@ -29,7 +29,7 @@ jobs:
           gradle-version: 8.5
           cache-disabled: true # Mematikan cache agar tidak error 400 lagi
 
-      - name: Build with Gradle
+      - name: Build Plugin
         run: gradle :SansekaiPlugin:make --stacktrace --no-daemon
 
       - name: Deploy

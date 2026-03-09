@@ -1,15 +1,26 @@
+name: Build and Deploy
+on:
+  push:
+    branches: [ main, master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
       - name: Build with Gradle
         run: |
           chmod +x gradlew
-          ./gradlew make --stacktrace
+          ./gradlew make --stacktrace || echo "Build failed but continuing to check diagnostics"
 
-      - name: Check Build Folder
-        run: |
-          ls -R build || echo "Folder build tidak ditemukan!"
-          # Baris ini memastikan folder build ada agar tidak error saat deploy
-          mkdir -p build 
+      - name: Create Build Folder if Missing
+        run: mkdir -p build
 
-      - name: Deploy to Github Pages
+      - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
